@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
+@Validated
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -19,8 +21,7 @@ public class CategoryController {
     @Operation(summary = "Get all categories")
     @GetMapping
     public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        List<CategoryResponse> categories = categoryService.getAllCategories();
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
     @Operation(summary = "Get a category by ID")

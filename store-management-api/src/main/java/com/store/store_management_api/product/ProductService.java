@@ -4,6 +4,7 @@ import com.store.store_management_api.category.Category;
 import com.store.store_management_api.category.CategoryMapper;
 import com.store.store_management_api.category.CategoryRepository;
 import com.store.store_management_api.category.CategoryResponse;
+import com.store.store_management_api.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ class ProductService {
 
     public ProductResponse findProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
         return productMapper.toProductResponse(product);
     }
 
@@ -43,7 +44,7 @@ class ProductService {
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByCategoryId(Long categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
-            throw new RuntimeException("Category not found with id: " + categoryId);
+            throw new ResourceNotFoundException("Category not found with id: " + categoryId);
         }
         return productRepository.findByCategoriesId(categoryId)
                 .stream()
@@ -54,7 +55,7 @@ class ProductService {
     @Transactional(readOnly = true)
     public List<CategoryResponse> getProductCategories(Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
         return product.getCategories()
                 .stream()
                 .map(categoryMapper::toResponse)
@@ -64,7 +65,7 @@ class ProductService {
     @Transactional
     public ProductResponse updateProduct(Long id, ProductRequest request) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
         productMapper.updateProduct(request, product);
         Product updatedProduct = productRepository.save(product);
         return productMapper.toProductResponse(updatedProduct);
@@ -72,7 +73,7 @@ class ProductService {
 
     public ProductResponse changePrice(Long id, BigDecimal newPrice) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
         product.setPrice(newPrice);
         Product updatedProduct = productRepository.save(product);
         return productMapper.toProductResponse(updatedProduct);
@@ -81,16 +82,16 @@ class ProductService {
     @Transactional
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
         productRepository.delete(product);
     }
 
     @Transactional
     public ProductResponse assignCategoryToProduct(Long productId, Long categoryId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
         product.getCategories().add(category);
         Product savedProduct = productRepository.save(product);
         return productMapper.toProductResponse(savedProduct);
@@ -99,9 +100,9 @@ class ProductService {
     @Transactional
     public ProductResponse removeCategoryFromProduct(Long productId, Long categoryId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
         product.getCategories().remove(category);
         Product savedProduct = productRepository.save(product);
         return productMapper.toProductResponse(savedProduct);
