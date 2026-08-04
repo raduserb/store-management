@@ -7,6 +7,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -64,6 +65,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Delete a product by ID")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
@@ -86,10 +88,12 @@ public class ProductController {
     }
 
     @Operation(summary = "Remove a category from a product")
+    @PreAuthorize("hasRole('ADMIN')") // Restricts access to ADMIN role only
     @DeleteMapping("/{productId}/categories/{categoryId}")
     public ResponseEntity<ProductResponse> removeCategoryFromProduct(
             @PathVariable Long productId,
             @PathVariable Long categoryId) {
+
         ProductResponse productResponse = productService.removeCategoryFromProduct(productId, categoryId);
         return ResponseEntity.ok(productResponse);
     }
