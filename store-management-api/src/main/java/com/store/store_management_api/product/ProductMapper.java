@@ -9,7 +9,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring",
         uses = CategoryMapper.class,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-interface ProductMapper {
+public interface ProductMapper {
 
     @Mapping(target = "categories", ignore = true)
     Product toProduct(ProductRequest productRequest);
