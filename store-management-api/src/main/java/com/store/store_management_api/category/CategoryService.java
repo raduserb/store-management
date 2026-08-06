@@ -1,6 +1,8 @@
 package com.store.store_management_api.category;
 
 import com.store.store_management_api.exception.ResourceNotFoundException;
+import com.store.store_management_api.product.Product;
+import com.store.store_management_api.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final ProductRepository productRepository;
 
     @Transactional
     public CategoryResponse createCategory(CategoryRequest request) {
@@ -67,11 +70,23 @@ class CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
         log.info("Attempting to delete category with ID: {}", id);
-        if (!categoryRepository.existsById(id)) {
-            log.warn("Category not found with ID: {} for deletion.", id);
-            throw new ResourceNotFoundException("Category not found with id: " + id);
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Category not found with ID: {} for deletion.", id);
+                    return new ResourceNotFoundException("Category not found with id: " + id);
+                });
+
+        List<Product> products = productRepository.findByCategories_Id(id);
+        if (!products.isEmpty()) {
+            log.info("Found {} products associated with category ID: {}. Removing associations to prevent foreign key violation.", products.size(), id);
+            for (Product product : products) {
+                product.getCategories().remove(category);
+            }
+            productRepository.saveAll(products);
         }
-        categoryRepository.deleteById(id);
+
+        categoryRepository.delete(category);
         log.info("Category with ID: {} deleted successfully.", id);
     }
 }
