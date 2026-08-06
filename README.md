@@ -72,4 +72,4 @@ Endpoints for categories require authentication. To test these via Swagger:
 | **Register & Login** | Yes | Yes | Yes |
 | **Products (View, Create, Update)** | Yes | Yes | Yes |
 | **Categories (View, Create, Update)** | No | Yes | Yes |
-| **Delete Products & Categories** | No | No | Yes |
+| **Delete Products & Categorie Mapping** | No | No | Yes |
